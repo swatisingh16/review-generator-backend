@@ -13,9 +13,13 @@ const businessSchema = new mongoose.Schema(
     website: String,
     about: String,
     reviewLink: { type: String, required: true },
-    logo: String, 
+    logo: String,
     languages: [String],
     visits: { type: Number, default: 0 },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     reviewsGenerated: { type: Number, default: 0 },
   },
   { timestamps: true }

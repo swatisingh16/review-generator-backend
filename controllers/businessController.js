@@ -68,3 +68,12 @@ export const updateBusiness = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
+
+export const deleteBusiness = async (req, res) => {
+    try {
+        await Business.findByIdAndDelete(req.params.id);
+        res.json({ message: "Business deleted successfully" });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
