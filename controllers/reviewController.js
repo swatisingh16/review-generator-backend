@@ -1,14 +1,8 @@
+import fetch from "node-fetch";
 import Business from "../models/Business.js";
 
 export const generateReview = async (req, res) => {
-  const business = await Business.findById(businessId);
-
-  if (!business || !business.isActive) {
-    return res.status(403).json({
-      error: "This Tapitkardz AI Review Generator has been deactivated",
-    });
-  }
-
+  
   const {
     businessId,
     businessName,
@@ -18,7 +12,15 @@ export const generateReview = async (req, res) => {
     highlights,
     language,
   } = req.body;
+  
+  const business = await Business.findById(businessId);
 
+  if (!business || !business.isActive) {
+    return res.status(403).json({
+      error: "This Tapitkardz AI Review Generator has been deactivated",
+    });
+  }
+  
   if (!businessName || !language) {
     return res.status(400).json({ error: "Missing required data" });
   }
