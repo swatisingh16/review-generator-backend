@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import Business from "../models/Business.js";
 
 export const generateReview = async (req, res) => {
