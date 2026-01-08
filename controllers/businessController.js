@@ -1,30 +1,48 @@
 import Business from "../models/Business.js";
-
-// utils/languages.js
-export const normalizeLanguages = (languages) => {
-    if (!languages) return [];
-    if (Array.isArray(languages)) return languages;
-    if (typeof languages === "string") {
-        try {
-            const parsed = JSON.parse(languages);
-            if (Array.isArray(parsed)) return parsed;
-            return [parsed];
-        } catch {
-            return languages.split(",").map((l) => l.trim()).filter(Boolean);
-        }
-    }
-    return [];
-};
+import { normalizeLanguages, slugify } from "../utils/languages.js";
 
 export const createBusiness = async (req, res) => {
     try {
+        const slug = slugify(req.body.name);
+
         const business = await Business.create({
             ...req.body,
+            slug,
             languages: normalizeLanguages(req.body.languages),
-            logo: req.file ? `/uploads/${req.file.filename}` : null,
+            logo: req.file ? req.file.path : null,
         });
 
         res.status(201).json(business);
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({
+                error: "Business with this name already exists",
+            });
+        }
+
+        res.status(400).json({ error: err.message });
+    }
+};
+
+
+export const updateBusiness = async (req, res) => {
+    try {
+        const updates = {
+            ...req.body,
+            ...(req.body.name && { slug: slugify(req.body.name) }),
+            ...(req.body.languages && {
+                languages: normalizeLanguages(req.body.languages),
+            }),
+            ...(req.file && { logo: req.file.path }),
+        };
+
+        const business = await Business.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true }
+        );
+
+        res.json(business);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -35,8 +53,9 @@ export const getBusinesses = async (req, res) => {
     res.json(businesses);
 };
 
-export const getBusinessById = async (req, res) => {
-    const business = await Business.findById(req.params.id);
+export const getBusinessBySlug = async (req, res) => {
+    const business = await Business.findOne({ slug: req.params.slug });
+
     if (!business) {
         return res.status(404).json({ error: "Business not found" });
     }
@@ -45,28 +64,6 @@ export const getBusinessById = async (req, res) => {
     await business.save();
 
     res.json(business);
-};
-
-export const updateBusiness = async (req, res) => {
-    try {
-        const updates = {
-            ...req.body,
-            ...(req.body.languages !== undefined && {
-                languages: normalizeLanguages(req.body.languages),
-            }),
-            ...(req.file && { logo: `/uploads/${req.file.filename}` }),
-        };
-
-        const business = await Business.findByIdAndUpdate(
-            req.params.id,
-            updates,
-            { new: true, runValidators: true }
-        );
-
-        res.json(business);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
 };
 
 export const deleteBusiness = async (req, res) => {

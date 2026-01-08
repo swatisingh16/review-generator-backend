@@ -8,6 +8,7 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
@@ -16,6 +17,7 @@
     "mongodb": "^5.7.0",
     "mongoose": "^9.1.2",
     "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "node-fetch": "^3.3.2",
     "openai": "^4.0.0",
     "react-hot-toast": "^2.6.0"

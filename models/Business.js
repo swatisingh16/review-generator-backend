@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const businessSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    slug: { type: String, required: true, unique: true, index: true },
     type: String,
     keywords: String,
     city: String,
@@ -16,13 +17,11 @@ const businessSchema = new mongoose.Schema(
     logo: String,
     languages: [String],
     visits: { type: Number, default: 0 },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    isActive: { type: Boolean, default: true },
     reviewsGenerated: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
+
 
 export default mongoose.model("Business", businessSchema);
