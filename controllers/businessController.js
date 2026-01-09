@@ -38,11 +38,17 @@ export const updateBusiness = async (req, res) => {
         const business = await Business.findByIdAndUpdate(
             req.params.id,
             updates,
-            { new: true }
+            { new: true, runValidators: true }
         );
 
         res.json(business);
     } catch (err) {
+        if (err.code === 11000 && err.keyPattern?.slug) {
+            return res.status(409).json({
+                error: "Business with this name already exists",
+            });
+        }
+
         res.status(400).json({ error: err.message });
     }
 };
