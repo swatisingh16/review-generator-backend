@@ -5,6 +5,7 @@ const businessSchema = new mongoose.Schema(
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true, index: true },
     type: String,
+    card: String,
     keywords: String,
     city: String,
     state: String,

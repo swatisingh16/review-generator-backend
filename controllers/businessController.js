@@ -24,7 +24,6 @@ export const createBusiness = async (req, res) => {
     }
 };
 
-
 export const updateBusiness = async (req, res) => {
     try {
         const updates = {
@@ -76,26 +75,26 @@ export const deleteBusiness = async (req, res) => {
 };
 
 export const getDashboardStats = async (req, res) => {
-  try {
-    const stats = await Business.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalBusinesses: { $sum: 1 },
-          totalReviewsGenerated: { $sum: "$reviewsGenerated" },
-          totalVisits: { $sum: "$visits" },
-        },
-      },
-    ]);
+    try {
+        const stats = await Business.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalBusinesses: { $sum: 1 },
+                    totalReviewsGenerated: { $sum: "$reviewsGenerated" },
+                    totalVisits: { $sum: "$visits" },
+                },
+            },
+        ]);
 
-    res.json(
-      stats[0] || {
-        totalBusinesses: 0,
-        totalReviewsGenerated: 0,
-        totalVisits: 0,
-      }
-    );
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch stats" });
-  }
+        res.json(
+            stats[0] || {
+                totalBusinesses: 0,
+                totalReviewsGenerated: 0,
+                totalVisits: 0,
+            }
+        );
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch stats" });
+    }
 };
