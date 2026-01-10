@@ -5,11 +5,15 @@ export const createBusiness = async (req, res) => {
     try {
         const slug = slugify(req.body.name);
 
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + 6);
+
         const business = await Business.create({
             ...req.body,
             slug,
             languages: normalizeLanguages(req.body.languages),
             logo: req.file ? req.file.path : null,
+            expiresAt
         });
 
         res.status(201).json(business);
@@ -54,15 +58,33 @@ export const updateBusiness = async (req, res) => {
 };
 
 export const getBusinesses = async (req, res) => {
+    const now = new Date();
+
+    await Business.updateMany(
+        { isActive: true, expiresAt: { $lte: now } },
+        { $set: { isActive: false } }
+    );
+
     const businesses = await Business.find().sort({ createdAt: -1 });
     res.json(businesses);
 };
 
 export const getBusinessBySlug = async (req, res) => {
+    const now = new Date();
+
     const business = await Business.findOne({ slug: req.params.slug });
 
     if (!business) {
         return res.status(404).json({ error: "Business not found" });
+    }
+
+    if (business.isActive && business.expiresAt <= now) {
+        business.isActive = false;
+        await business.save();
+    }
+
+    if (!business.isActive) {
+        return res.status(403).json({ error: "Your Tapitkardz AI Review Generator has been deactivated." });
     }
 
     business.visits += 1;
